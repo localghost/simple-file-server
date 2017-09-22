@@ -1,0 +1,20 @@
+language: go
+
+go:
+- 1.8
+
+before_deploy:
+- go build
+- export SFS_VERSION=`cat VERSION`
+- cat simple-file-server | gzip > sfs-$SFS_VERSION.gz
+
+deploy:
+  provider: releases
+  api_key:
+    secure: DiTCaAwqVsjIZUUydaH7VzegqQ2EbbzOKdSzCKmF0PVbYhIYeO8GIURdehrvaqlkHzRzVHYNS0EfnNOGp2d1w14CY/HZkE6MMOrgKUDebLLEsao34IEzKwtAUzknilljFNwJjWM/dyomoK/83A6bRV4Vpa35v4sIadZuyvzk4EBxeatNBYq6WuLXTJrLdJCHxoOmz5nrscbR/nvCIg+RkdZSDJP5F6R6SNR971PDV/UzBJ5HKZeMhPiEmjUUMkWPIk0xLV/sIVfm8uyY/nkueEeaQOmxVhBMpjVHUJf2PANcIp8seaw7EgFbGRkq0LlcPYYCo9vQSSDGatdoDxlqT8wIe7j5CEAcdrvGgbdfio+kh0ZuiRwIlas7cJI6nFAtmqrFycZH1a1rNx/wRTz9bLTH9vtp5Fjcntw+GwuajbC1AJWBH3pMHihPKAC1k7R1rWaFJextivMJib3XLrZrIXz1vGXHSs66UG96D9QpNRpuUuCdg2hUpjBqRJzM0AiH/N0bqGlAWHDzVANHRwUR91obZaFCL4vy6BB4XGMvsZh3NqWsi3buaVf2GftFQt3viLbsqUWFelGUHKNqnuxSgWLnHBkDaWTnjbIXgMOLo4gEVST2toT99aomxVfkrh3tzbN7JWZUbaIiq+EBq9Rp8QXAq6FEvexCRjsJKbu/ztY=
+  file: sfs-$SFS_VERSION.gz
+  skip_cleanup: true
+  on:
+    repo: localghost/simple-file-server
+    go: 1.8
+    tags: true
