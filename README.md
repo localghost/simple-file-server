@@ -1,10 +1,8 @@
 # simple-file-server
 
-Simple HTTP server for serving files.
+HTTP server serving files.
 
 ## Endpoints
-
-Currently, following endpoints are available:
 
 * `/files/[PATH]`: for accessing served files
 * `/filelist`: returns flat list of served files (each file in new line)
