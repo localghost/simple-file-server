@@ -28,7 +28,9 @@ func init() {
 func main() {
 	log.Println("Server starting")
 
-	NewServer(fmt.Sprintf("%s:%d", listenAddress, listenPort), servedDir).Start()
+	if err := NewServer(fmt.Sprintf("%s:%d", listenAddress, listenPort), servedDir).Start(); err != nil {
+		log.Fatalf("Server failed: %s\n", err)
+	}
 
 	log.Println("Server exiting")
 }
