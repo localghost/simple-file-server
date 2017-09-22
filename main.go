@@ -1,14 +1,10 @@
 package main
 
 import (
-	"context"
 	"flag"
-	"fmt"
 	"log"
-	"net/http"
 	"os"
-	"path/filepath"
-	"strings"
+	"fmt"
 )
 
 var servedDir string
@@ -29,50 +25,10 @@ func init() {
 	}
 }
 
-func buildFileList(response http.ResponseWriter, req *http.Request) {
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Printf("Error when walking served directory: %s\n", err)
-			return nil
-		}
-		if !info.IsDir() {
-			fmt.Fprintln(response, strings.TrimPrefix(path, servedDir))
-		}
-		return nil
-	}
-	filepath.Walk(servedDir, walkFunc)
-}
-
-func startServer(done chan bool) *http.Server {
-	server := &http.Server{Addr: fmt.Sprintf("%s:%d", listenAddress, listenPort)}
-
-	http.Handle("/files/", http.StripPrefix("/files", http.FileServer(http.Dir(servedDir))))
-	http.HandleFunc("/filelist", buildFileList)
-	http.HandleFunc("/shutdown", func(http.ResponseWriter, *http.Request) {
-		done <- true
-	})
-
-	go func() {
-		log.Printf("Serving %s\n", servedDir)
-		log.Printf("Listening on %s:%d\n", listenAddress, listenPort)
-		if err := server.ListenAndServe(); err != nil {
-			log.Printf("Finished listening: %s\n", err)
-		}
-	}()
-
-	return server
-}
-
 func main() {
 	log.Println("Server starting")
 
-	done := make(chan bool, 1)
-	server := startServer(done)
-	<-done
-
-	if err := server.Shutdown(context.Background()); err != nil {
-		log.Fatalf("Failed to shutdown the server: %s\n", err)
-	}
+	NewServer(fmt.Sprintf("%s:%d", listenAddress, listenPort), servedDir).Start()
 
 	log.Println("Server exiting")
 }
