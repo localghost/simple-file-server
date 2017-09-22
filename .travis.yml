@@ -16,3 +16,5 @@ deploy:
   skip_cleanup: true
   on:
     repo: localghost/simple-file-server
+    go: 1.8
+    tags: true
