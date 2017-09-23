@@ -4,18 +4,18 @@ HTTP server serving files.
 
 ## Endpoints
 
-* `/files/[PATH]`: for accessing served files
-* `/filelist`: returns flat list of served files (each file in new line), supported query parameters:
+* `/files/[PATH]`: access served files
+* `/filelist`: return flat list of served files (each file in new line), supported query parameters:
   * `file`
     * `any`: return files and directories
     * `file`: return only files
     * `dir`: return only directories
   * `recursive`
-    * `yes`: get list for the entire file tree
-    * `no`: list specific directory
+    * `yes`: list entire file tree
+    * `no`: list specific directory only
   * `startswith`: base directory to list (if omitted root directory is used)
-* `/shutdown`: instructs the server to shutdown itself
-* `/health`: for checking if server is up
+* `/shutdown`: instruct the server to shutdown itself
+* `/health`: check if server is up
 
 ### `/filelist` examples
 
