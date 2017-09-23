@@ -2,16 +2,11 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
-	"path/filepath"
-	"strings"
 )
 
-type Server struct {
+type server struct {
 	server *http.Server
 
 	servedDir string
@@ -20,8 +15,8 @@ type Server struct {
 	err      chan error
 }
 
-func NewServer(address, servedDir string) *Server {
-	return &Server{
+func NewServer(address, servedDir string) *server {
+	return &server{
 		server:    &http.Server{Addr: address},
 		servedDir: servedDir,
 		shutdown:  make(chan bool, 1),
@@ -29,19 +24,19 @@ func NewServer(address, servedDir string) *Server {
 	}
 }
 
-func (s *Server) Start() error {
+func (s *server) Start() error {
 	s.registerHandlers()
 	return s.serve()
 }
 
-func (s *Server) registerHandlers() {
-	http.Handle("/files/", http.StripPrefix("/files", http.FileServer(http.Dir(servedDir))))
-	http.HandleFunc("/filelist", s.filelistHandler)
+func (s *server) registerHandlers() {
+	http.Handle("/files/", http.StripPrefix("/files", http.FileServer(http.Dir(s.servedDir))))
+	http.Handle("/filelist", NewFileListHandler(s.servedDir))
 	http.HandleFunc("/shutdown", s.shutdownHandler)
 	http.HandleFunc("/health", func(response http.ResponseWriter, req *http.Request) {})
 }
 
-func (s *Server) serve() error {
+func (s *server) serve() error {
 	go func() {
 		log.Printf("Serving %s\n", s.servedDir)
 		log.Printf("Listening on %s\n", s.server.Addr)
@@ -68,54 +63,6 @@ func (s *Server) serve() error {
 	return nil
 }
 
-func (s *Server) filelistHandler(response http.ResponseWriter, req *http.Request) {
-	query := req.URL.Query()
-	query.Add("type", "file")
-	query.Add("recursive", "yes")
-	fileType := query.Get("type")
-	recursive := query.Get("recursive")
-
-	printFile := func(path string, info os.FileInfo) {
-		switch fileType {
-		case "any":
-			fmt.Fprintln(response, strings.TrimPrefix(path, s.servedDir))
-		case "file":
-			if !info.IsDir() {
-				fmt.Fprintln(response, strings.TrimPrefix(path, s.servedDir))
-			}
-		case "dir":
-			if info.IsDir() {
-				fmt.Fprintln(response, strings.TrimPrefix(path, s.servedDir))
-			}
-		}
-	}
-
-	walkFunc := func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			log.Printf("Error when walking served directory: %s\n", err)
-			return nil
-		}
-		printFile(path, info)
-		return nil
-	}
-
-	if recursive == "yes" {
-		filepath.Walk(s.servedDir, walkFunc)
-	} else if recursive == "no" {
-		if files, err := ioutil.ReadDir(s.servedDir); err == nil {
-			for _, file := range files {
-				printFile(file.Name(), file)
-			}
-		} else {
-			response.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(response, err)
-		}
-	} else {
-		response.WriteHeader(http.StatusBadRequest)
-		fmt.Fprintf(response, "'%s' is not a valid option for 'recursive' parameter\n", recursive)
-	}
-}
-
-func (s *Server) shutdownHandler(http.ResponseWriter, *http.Request) {
+func (s *server) shutdownHandler(http.ResponseWriter, *http.Request) {
 	s.shutdown <- true
 }

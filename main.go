@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"os"
-	"fmt"
 )
 
 var servedDir string
@@ -26,11 +26,11 @@ func init() {
 }
 
 func main() {
-	log.Println("Server starting")
+	log.Println("server starting")
 
 	if err := NewServer(fmt.Sprintf("%s:%d", listenAddress, listenPort), servedDir).Start(); err != nil {
-		log.Fatalf("Server failed: %s\n", err)
+		log.Fatalf("server failed: %s\n", err)
 	}
 
-	log.Println("Server exiting")
+	log.Println("server exiting")
 }
