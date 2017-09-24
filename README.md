@@ -2,6 +2,13 @@
 
 HTTP server serving files.
 
+## Parameters
+
+* `-h`: print help message
+* `-served-dir`: directory to serve files from (default: current working directory)
+* `-listen-addr`: address to listen on (default: 0.0.0.0)
+* `-listen-port`: port to listen on (default: 3000)
+
 ## Endpoints
 
 * `/files/[PATH]`: access served files
