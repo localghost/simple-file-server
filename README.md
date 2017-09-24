@@ -8,10 +8,10 @@ HTTP server serving files.
 * `/filelist`: return flat list of served files (each file in new line), supported query parameters:
   * `type`
     * `any`: return files and directories
-    * `file`: return only files
+    * `file`: return only files (default)
     * `dir`: return only directories
   * `recursive`
-    * `yes`: list entire file tree
+    * `yes`: list entire file tree (default)
     * `no`: list specific directory only
   * `startswith`: base directory to list (if omitted root directory is used)
 * `/shutdown`: instruct the server to shutdown itself
