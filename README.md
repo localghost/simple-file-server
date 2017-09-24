@@ -6,7 +6,7 @@ HTTP server serving files.
 
 * `/files/[PATH]`: access served files
 * `/filelist`: return flat list of served files (each file in new line), supported query parameters:
-  * `file`
+  * `type`
     * `any`: return files and directories
     * `file`: return only files
     * `dir`: return only directories
